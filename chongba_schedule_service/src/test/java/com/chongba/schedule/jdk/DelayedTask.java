@@ -64,8 +64,8 @@ public class DelayedTask implements Delayed {
             try {
                 //每次间隔一秒
                 Thread.sleep( 1000 );
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                log.info( e.getMessage() );
             }
         }
     }
