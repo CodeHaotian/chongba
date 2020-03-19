@@ -28,7 +28,7 @@ public class TaskInfoLogsEntity extends TaskInfoEntity {
     private Integer version;
 
     /**
-     * 状态 0=初始化状态 1=执行 2=CANCELLED
+     * 状态 0=初始化状态 1=执行 2=取消
      */
     @TableField
     private Integer status;
