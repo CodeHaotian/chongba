@@ -5,6 +5,7 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 
 /**
  * @Author: Haotian
@@ -13,6 +14,7 @@ import org.springframework.context.annotation.Bean;
  */
 @SpringBootApplication
 @MapperScan("com.chongba.schedule.mapper")
+@ComponentScan({"com.chongba.cache","com.chongba.schedule"})
 public class ScheduleApplication {
     public static void main(String[] args) {
         SpringApplication.run( ScheduleApplication.class, args );
