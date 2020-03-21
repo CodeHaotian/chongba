@@ -268,8 +268,8 @@ public class CacheService extends CachingConfigurerSupport {
     /**
      * 将值 value 关联到 key ，并将 key 的过期时间设为 timeout
      *
-     * @param key
-     * @param value
+     * @param key     键名
+     * @param value   储存内容
      * @param timeout 过期时间
      * @param unit    时间单位, 天:TimeUnit.DAYS 小时:TimeUnit.HOURS 分钟:TimeUnit.MINUTES
      *                秒:TimeUnit.SECONDS 毫秒:TimeUnit.MILLISECONDS
@@ -394,10 +394,23 @@ public class CacheService extends CachingConfigurerSupport {
         return stringRedisTemplate.opsForHash().multiGet( key, fields );
     }
 
+    /**
+     * 保存hash类型数据
+     *
+     * @param key     键名
+     * @param hashKey 域名
+     * @param value   储存内容
+     */
     public void hPut(String key, String hashKey, String value) {
         stringRedisTemplate.opsForHash().put( key, hashKey, value );
     }
 
+    /**
+     * 保存hash类型数据
+     *
+     * @param key  键名
+     * @param maps 数据map
+     */
     public void hPutAll(String key, Map<String, String> maps) {
         stringRedisTemplate.opsForHash().putAll( key, maps );
     }
@@ -527,10 +540,10 @@ public class CacheService extends CachingConfigurerSupport {
     }
 
     /**
-     * 存储在list头部
+     * 从左存储在list集合元素
      *
-     * @param key
-     * @param value
+     * @param key   键名
+     * @param value 储存内容
      * @return
      */
     public Long lLeftPush(String key, String value) {
@@ -579,8 +592,10 @@ public class CacheService extends CachingConfigurerSupport {
     }
 
     /**
-     * @param key
-     * @param value
+     * 从右储存list元素
+     *
+     * @param key   键名
+     * @param value 储存内容
      * @return
      */
     public Long lRightPush(String key, String value) {
@@ -640,9 +655,9 @@ public class CacheService extends CachingConfigurerSupport {
     }
 
     /**
-     * 移出并获取列表的第一个元素
+     * 从左移出并获取列表的第一个元素
      *
-     * @param key
+     * @param key 键名
      * @return 删除的元素
      */
     public String lLeftPop(String key) {
@@ -1015,10 +1030,10 @@ public class CacheService extends CachingConfigurerSupport {
     /**
      * 添加元素,有序集合是按照元素的score值由小到大排列
      *
-     * @param key
-     * @param value
-     * @param score
-     * @return
+     * @param key   键名
+     * @param value 储存类容
+     * @param score 排序分数
+     * @return 是否成功
      */
     public Boolean zAdd(String key, String value, double score) {
         return stringRedisTemplate.opsForZSet().add( key, value, score );
@@ -1087,10 +1102,10 @@ public class CacheService extends CachingConfigurerSupport {
     /**
      * 获取集合的元素, 从小到大排序
      *
-     * @param key
+     * @param key   键名
      * @param start 开始位置
      * @param end   结束位置, -1查询所有
-     * @return
+     * @return 符合数据
      */
     public Set<String> zRange(String key, long start, long end) {
         return stringRedisTemplate.opsForZSet().range( key, start, end );
