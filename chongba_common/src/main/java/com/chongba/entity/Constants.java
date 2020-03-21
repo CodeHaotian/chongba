@@ -20,4 +20,9 @@ public class Constants {
      * 已取消状态
      */
     public static final int CANCELLED = 2;
+
+    /**
+     * 任务缓存key
+     */
+    public static final String DB_CACHE="db_cache";
 }
