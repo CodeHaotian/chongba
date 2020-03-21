@@ -27,4 +27,19 @@ public interface TaskService {
      * @throws TaskNotExistException 任务异常
      */
     boolean cancelTask(long taskId) throws TaskNotExistException;
+
+    /**
+     * 获取任务数量
+     *
+     * @return 任务数量
+     */
+    long size();
+
+    /**
+     * 拉取任务
+     *
+     * @return 任务实体
+     * @throws TaskNotExistException 任务异常
+     */
+    Task poll() throws TaskNotExistException;
 }

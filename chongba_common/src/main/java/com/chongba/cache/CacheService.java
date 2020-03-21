@@ -1049,9 +1049,11 @@ public class CacheService extends CachingConfigurerSupport {
     }
 
     /**
-     * @param key
-     * @param values
-     * @return
+     * 移除缓存内容
+     *
+     * @param key    键名
+     * @param values 储存内容
+     * @return 移除元素数量
      */
     public Long zRemove(String key, Object... values) {
         return stringRedisTemplate.opsForZSet().remove( key, values );
@@ -1134,7 +1136,7 @@ public class CacheService extends CachingConfigurerSupport {
     /**
      * 根据Score值查询集合元素
      *
-     * @param key
+     * @param key 键名
      * @param min 最小值
      * @param max 最大值
      * @return

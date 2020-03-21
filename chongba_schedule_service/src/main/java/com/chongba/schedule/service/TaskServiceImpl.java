@@ -1,6 +1,8 @@
 package com.chongba.schedule.service;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.chongba.cache.CacheService;
 import com.chongba.entity.Constants;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.Set;
 
 /**
  * @Author: Haotian
@@ -139,5 +142,37 @@ public class TaskServiceImpl implements TaskService {
      */
     private void removeTaskFromCache(Task task) {
         cacheService.zRemove( Constants.DB_CACHE, JSON.toJSONString( task ) );
+    }
+
+    @Override
+    public long size() {
+        Set<String> rangeAll = cacheService.zRangeAll( Constants.DB_CACHE );
+        return rangeAll.size();
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Task poll() throws TaskNotExistException {
+        Task task = null;
+        try {
+            //获取当前时间任务
+            Set<String> byScore = cacheService.zRangeByScore( Constants.DB_CACHE, 0, System.currentTimeMillis() );
+            if (CollUtil.isNotEmpty( byScore )) {
+                //获取第一个可执行任务
+                String taskJson = byScore.iterator().next();
+                if (StrUtil.isNotEmpty( taskJson )) {
+                    //还原对象
+                    task = JSON.parseObject( taskJson, Task.class );
+                    //从缓存中移除当前任务
+                    cacheService.zRemove( Constants.DB_CACHE, taskJson );
+                    //更新数据库
+                    updateDb( task.getTaskId(), Constants.EXECUTED );
+                }
+            }
+        } catch (Exception e) {
+            log.error( "poll task exception" );
+            throw new TaskNotExistException( e );
+        }
+        return task;
     }
 }
