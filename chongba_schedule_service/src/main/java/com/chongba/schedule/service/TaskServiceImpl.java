@@ -20,7 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -174,5 +176,34 @@ public class TaskServiceImpl implements TaskService {
             throw new TaskNotExistException( e );
         }
         return task;
+    }
+
+    /**
+     * 缓存恢复
+     */
+    @PostConstruct
+    private void syncData() {
+        log.info( "******init******" );
+        // 清除缓存中原有的数据
+        clearCache();
+        //从数据库查询所有任务数据
+        List<TaskInfoEntity> taskInfos = taskInfoMapper.findAll();
+        //将任务数据存入缓存
+        taskInfos.forEach( t -> {
+            Task task = new Task();
+            //属性拷贝
+            BeanUtils.copyProperties( t, task );
+            task.setExecuteTime( t.getExecuteTime().getTime() );
+            //加入缓存
+            addTaskToCache( task );
+        } );
+
+    }
+
+    /**
+     * 移除缓存中的数据
+     */
+    private void clearCache() {
+        cacheService.delete( Constants.DB_CACHE );
     }
 }
