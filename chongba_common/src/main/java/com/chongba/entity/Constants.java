@@ -24,5 +24,15 @@ public class Constants {
     /**
      * 任务缓存key
      */
-    public static final String DB_CACHE="db_cache";
+    public static final String DB_CACHE = "db_cache";
+
+    /**
+     * 消费队列key前缀
+     */
+    public static String TOPIC = "topic_";
+
+    /**
+     * 待消费队列key前缀
+     */
+    public static String FUTURE = "future_";
 }

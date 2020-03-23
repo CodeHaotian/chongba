@@ -36,10 +36,29 @@ public interface TaskService {
     long size();
 
     /**
+     * 按照类型和优先级获取任务数量
+     *
+     * @param type     任务类型
+     * @param priority 任务优先级
+     * @return 任务数量
+     */
+    long size(int type, int priority);
+
+    /**
      * 拉取任务
      *
      * @return 任务实体
      * @throws TaskNotExistException 任务异常
      */
     Task poll() throws TaskNotExistException;
+
+    /**
+     * 按照类型和优先级来拉取任务
+     *
+     * @param type  任务类型
+     * @param priority 任务优先级
+     * @return 任务实体
+     * @throws TaskNotExistException 任务异常
+     */
+    Task poll(int type, int priority) throws TaskNotExistException;
 }

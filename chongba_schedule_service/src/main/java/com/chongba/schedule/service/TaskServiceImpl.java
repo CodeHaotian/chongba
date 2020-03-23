@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -92,7 +93,14 @@ public class TaskServiceImpl implements TaskService {
      * @param task 任务数据
      */
     private void addTaskToCache(Task task) {
-        cacheService.zAdd( Constants.DB_CACHE, JSON.toJSONString( task ), task.getExecuteTime() );
+        // 使用任务类型和优先级作为key
+        String key = task.getTaskType() + "_" + task.getPriority();
+        // 判断任务应该放入消费者队列还是未来数据集合
+        if (task.getExecuteTime() <= System.currentTimeMillis()) {
+            cacheService.lLeftPush( Constants.TOPIC + key, JSON.toJSONString( task ) );
+        } else {
+            cacheService.zAdd( Constants.FUTURE, JSON.toJSONString( task ), task.getExecuteTime() );
+        }
     }
 
     @Override
@@ -101,7 +109,7 @@ public class TaskServiceImpl implements TaskService {
         boolean flag = false;
         //更新数据库
         Task task = updateDb( taskId, Constants.CANCELLED );
-        if (task != null) {
+        if (Objects.nonNull( task )) {
             //更新缓存
             removeTaskFromCache( task );
             flag = true;
@@ -143,13 +151,28 @@ public class TaskServiceImpl implements TaskService {
      * @param task 任务数据
      */
     private void removeTaskFromCache(Task task) {
-        cacheService.zRemove( Constants.DB_CACHE, JSON.toJSONString( task ) );
+        String key = task.getTaskType() + "_" + task.getPriority();
+        //判断是从消费者队列移除还是从未来数据集合中移除
+        if (task.getExecuteTime() <= System.currentTimeMillis()) {
+            cacheService.lRemove( Constants.TOPIC + key, 0, JSON.toJSONString( task ) );
+        } else {
+            cacheService.zRemove( Constants.FUTURE + key, JSON.toJSONString( task ) );
+        }
     }
 
     @Override
     public long size() {
         Set<String> rangeAll = cacheService.zRangeAll( Constants.DB_CACHE );
         return rangeAll.size();
+    }
+
+    @Override
+    public long size(int type, int priority) {
+        // 任务数量=未来数据集合中的任务数量+消费者队列中的数量
+        String key = type + "_" + priority;
+        Set<String> zRangeAll = cacheService.zRangeAll( Constants.FUTURE + key );
+        Long len = cacheService.lLen( Constants.TOPIC + key );
+        return zRangeAll.size() + len;
     }
 
     @Override
@@ -173,6 +196,27 @@ public class TaskServiceImpl implements TaskService {
             }
         } catch (Exception e) {
             log.error( "poll task exception" );
+            throw new TaskNotExistException( e );
+        }
+        return task;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Task poll(int type, int priority) throws TaskNotExistException {
+        Task task = null;
+        String key = type + "_" + priority;
+        try {
+            //获取第一个可执行任务
+            String taskJson = cacheService.lRightPop( Constants.TOPIC + key );
+            if (StrUtil.isNotEmpty( taskJson )) {
+                //还原对象
+                task = JSON.parseObject( taskJson, Task.class );
+                //更新数据库
+                updateDb( task.getTaskId(), Constants.EXECUTED );
+            }
+        } catch (Exception e) {
+            log.error( "poll task exception,type={},priority={}", type, priority );
             throw new TaskNotExistException( e );
         }
         return task;
