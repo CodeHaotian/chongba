@@ -332,8 +332,8 @@ public class CacheService extends CachingConfigurerSupport {
     /**
      * 增加(自增长), 负数则为自减
      *
-     * @param key
-     * @param
+     * @param key       键名
+     * @param increment 初始参数
      * @return
      */
     public Long incrBy(String key, long increment) {
@@ -1417,7 +1417,14 @@ public class CacheService extends CachingConfigurerSupport {
         return results;
     }
 
-
+    /**
+     * 使用管道技术执行任务
+     *
+     * @param futureKey 未消费key
+     * @param topicKey  消费key
+     * @param tasks     任务集合
+     * @return 任务执行情况
+     */
     public List<Object> refreshWithPipeline(String futureKey, String topicKey, Collection<String> tasks) {
 
         List<Object> result = stringRedisTemplate.executePipelined( new RedisCallback<Object>() {
@@ -1426,7 +1433,9 @@ public class CacheService extends CachingConfigurerSupport {
             public Object doInRedis(RedisConnection redisConnection) throws DataAccessException {
                 StringRedisConnection stringRedisConnection = (StringRedisConnection) redisConnection;
                 String[] allTask = tasks.toArray( new String[tasks.size()] );
+                //添加新任务到队列
                 stringRedisConnection.lPush( topicKey, allTask );
+                //删除任务等待集合中的数据
                 stringRedisConnection.zRem( futureKey, allTask );
                 return null;
             }

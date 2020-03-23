@@ -17,6 +17,7 @@ import com.chongba.schedule.pojo.TaskInfoLogsEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -248,6 +249,30 @@ public class TaskServiceImpl implements TaskService {
      * 移除缓存中的数据
      */
     private void clearCache() {
-        cacheService.delete( Constants.DB_CACHE );
+        //移除未来数据集合
+        Set<String> futureKeys = cacheService.scan( Constants.FUTURE + "*" );
+        cacheService.delete( futureKeys );
+        //移除消费者队列
+        Set<String> topicKeys = cacheService.scan( Constants.TOPIC + "*" );
+        cacheService.delete( topicKeys );
+    }
+
+    /**
+     * 每秒刷新待消费任务到消费对列
+     */
+    @Scheduled(cron = "*/1 * * * * ?")
+    public void refresh() {
+        //从未来数据集合中获取所有的key
+        Set<String> futureKeys = cacheService.scan( Constants.FUTURE + "*" );
+        for (String futureKey : futureKeys) {
+            //转换key future_001_001 ->  topic_001_001
+            String topicKey = Constants.TOPIC + futureKey.split( Constants.FUTURE )[1];
+            //获取当前key的任务数据集合
+            Set<String> values = cacheService.zRangeByScore( futureKey, 0, System.currentTimeMillis() );
+            if (!values.isEmpty()) {
+                cacheService.refreshWithPipeline( futureKey, topicKey, values );
+                log.info( "成功的将{}定时刷新到{}", futureKey, topicKey );
+            }
+        }
     }
 }

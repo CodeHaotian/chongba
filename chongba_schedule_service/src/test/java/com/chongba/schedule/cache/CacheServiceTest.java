@@ -2,17 +2,21 @@ package com.chongba.schedule.cache;
 
 import com.alibaba.fastjson.JSON;
 import com.chongba.cache.CacheService;
+import com.chongba.entity.Constants;
 import com.chongba.entity.Task;
 import com.chongba.schedule.ScheduleApplication;
 import lombok.extern.slf4j.Slf4j;
+import org.assertj.core.annotations.Nullable;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -96,5 +100,48 @@ public class CacheServiceTest {
         //cacheService.zRangeAll( "task" ).forEach( System.out::println );
         //倒序排列
         cacheService.zReverseRangeByScore( "task", 0, System.currentTimeMillis() ).forEach( System.out::println );
+    }
+
+    @Test
+    public void testPiple() {
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < 10000; i++) {
+            // stringRedisTemplate.opsForValue().increment(key, increment);
+            cacheService.incrBy( "pipelined", 1 );
+        }
+        log.info( "执行10000次自增操作共耗时:{}毫秒", (System.currentTimeMillis() - start) );
+        start = System.currentTimeMillis();
+        //使用管道技术
+        List<Object> objectList = cacheService.getStringRedisTemplate().executePipelined( new RedisCallback<Object>() {
+            @Nullable
+            @Override
+            public Object doInRedis(RedisConnection redisConnection) throws DataAccessException {
+                for (int i = 0; i < 10000; i++) {
+                    redisConnection.incrBy( "pipelined".getBytes(), 1 );
+                }
+                return null;
+            }
+        } );
+        log.info( "使用管道技术执行10000次自增操作共耗时:{}毫秒", (System.currentTimeMillis() - start) );
+    }
+
+    @Test
+    public void refreshPiplineTest() {
+        List<String> list = new ArrayList<String>();
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < 1000000; i++) {
+            Task task = Task.builder()
+                    .taskType( i )
+                    .executeTime( System.currentTimeMillis() )
+                    .priority( i )
+                    .parameters( "refreshPiplineTest".getBytes() ).build();
+            list.add( JSON.toJSONString( task ) );
+            cacheService.lLeftPush( "demo", JSON.toJSONString( task ) );
+        }
+        log.info( "未使用管道耗时{}毫秒", (System.currentTimeMillis() - start) );
+        start = System.currentTimeMillis();
+        String key = "demo";
+        cacheService.refreshWithPipeline( Constants.FUTURE + key, Constants.TOPIC + key, list );
+        log.info( "使用管道耗时{}毫秒", (System.currentTimeMillis() - start) );
     }
 }
