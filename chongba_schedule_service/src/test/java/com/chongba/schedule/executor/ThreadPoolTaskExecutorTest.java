@@ -1,6 +1,7 @@
 package com.chongba.schedule.executor;
 
 import com.chongba.schedule.ScheduleApplication;
+import com.chongba.schedule.async.AsyncTask;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,6 +21,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class ThreadPoolTaskExecutorTest {
     @Autowired
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
+    @Autowired
+    private AsyncTask asyncTask;
 
     @Test
     public void testThreadPoolTaskExecutor() {
@@ -41,5 +44,12 @@ public class ThreadPoolTaskExecutorTest {
         log.info( "线程等待超时时间:{}", threadPoolTaskExecutor.getKeepAliveSeconds() );
         log.info( "当前活跃的线程数:{}", threadPoolTaskExecutor.getActiveCount() );
         log.info( "线程池内线程的名称前缀:{}", threadPoolTaskExecutor.getThreadNamePrefix() );
+    }
+
+    @Test
+    public void testAsyncTask() {
+        for (int i = 0; i < 100; i++) {
+            asyncTask.myAsync();
+        }
     }
 }
