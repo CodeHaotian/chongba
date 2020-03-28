@@ -49,6 +49,7 @@ public class ThreadPoolTaskExecutorTest {
     @Test
     public void testAsyncTask() {
         for (int i = 0; i < 100; i++) {
+            //测试异步调用
             asyncTask.myAsync();
         }
     }
