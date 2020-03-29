@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -20,6 +21,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest(classes = ScheduleApplication.class)
 public class ThreadPoolTaskExecutorTest {
     @Autowired
+    @Qualifier("visiableThreadPool")
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
     @Autowired
     private AsyncTask asyncTask;
@@ -51,6 +53,18 @@ public class ThreadPoolTaskExecutorTest {
         for (int i = 0; i < 100; i++) {
             //测试异步调用
             asyncTask.myAsync();
+        }
+    }
+
+    @Test
+    public void testVisable() {
+        for (int i = 0; i < 1000; i++) {
+            threadPoolTaskExecutor.execute( new Runnable() {
+                @Override
+                public void run() {
+                    System.out.println( "visiableThreadPool test-" + Thread.currentThread().getName() );
+                }
+            } );
         }
     }
 }

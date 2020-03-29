@@ -1,6 +1,7 @@
 package com.chongba.schedule;
 
 import com.baomidou.mybatisplus.extension.plugins.OptimisticLockerInterceptor;
+import com.chongba.schedule.service.VisiableThreadPool;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -53,5 +54,18 @@ public class ScheduleApplication {
         //直接初始化
         threadPool.initialize();
         return threadPool;
+    }
+
+    @Bean("visiableThreadPool")
+    public ThreadPoolTaskExecutor visiableThreadPool(){
+        ThreadPoolTaskExecutor visiableThreadPool = new VisiableThreadPool();
+        visiableThreadPool.setCorePoolSize(10);
+        visiableThreadPool.setMaxPoolSize(1000);
+        visiableThreadPool.setKeepAliveSeconds(60);
+        visiableThreadPool.setQueueCapacity(1000);
+        visiableThreadPool.setThreadNamePrefix("visiableThreadPool-");
+        visiableThreadPool.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
+        visiableThreadPool.initialize();
+        return visiableThreadPool;
     }
 }
