@@ -16,7 +16,9 @@ import com.chongba.schedule.pojo.TaskInfoLogsEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +27,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.*;
 
 /**
  * @Author: Haotian
@@ -39,18 +42,35 @@ public class TaskServiceImpl implements TaskService {
     @Autowired
     private TaskInfoLogsMapper taskInfoLogsMapper;
     @Autowired
+    @Qualifier("visiableThreadPool")
+    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
+    @Autowired
     private CacheService cacheService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public long addTask(Task task) throws ScheduleSystemException {
-        //添加任务到数据库
-        boolean success = addTaskToDb( task );
-        if (success) {
-            //添加任务到缓存
-            addTaskToCache( task );
+        Future<Long> future = threadPoolTaskExecutor.submit( new Callable<Long>() {
+            @Override
+            public Long call() throws Exception {
+                //添加任务到数据库
+                boolean success = addTaskToDb( task );
+                if (success) {
+                    //添加任务到缓存
+                    addTaskToCache( task );
+                }
+                return task.getTaskId();
+            }
+        } );
+        long taskId = -1;
+        try {
+            //获取结果
+            taskId = future.get( 5, TimeUnit.SECONDS );
+        } catch (Exception e) {
+            log.info( "add task exception" );
+            throw new ScheduleSystemException( e );
         }
-        return task.getTaskId();
+        return taskId;
     }
 
     /**
