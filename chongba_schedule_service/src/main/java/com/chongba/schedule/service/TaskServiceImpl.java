@@ -224,17 +224,26 @@ public class TaskServiceImpl implements TaskService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Task poll(int type, int priority) throws TaskNotExistException {
-        Task task = null;
-        String key = type + "_" + priority;
-        try {
-            //获取第一个可执行任务
-            String taskJson = cacheService.lRightPop( Constants.TOPIC + key );
-            if (StrUtil.isNotEmpty( taskJson )) {
-                //还原对象
-                task = JSON.parseObject( taskJson, Task.class );
-                //更新数据库
-                updateDb( task.getTaskId(), Constants.EXECUTED );
+        Future<Task> future = threadPoolTaskExecutor.submit( new Callable<Task>() {
+            @Override
+            public Task call() throws Exception {
+                Task task = null;
+                String key = type + "_" + priority;
+                //获取第一个可执行任务
+                String taskJson = cacheService.lRightPop( Constants.TOPIC + key );
+                if (StrUtil.isNotEmpty( taskJson )) {
+                    //还原对象
+                    task = JSON.parseObject( taskJson, Task.class );
+                    //更新数据库
+                    updateDb( task.getTaskId(), Constants.EXECUTED );
+                }
+                return task;
             }
+        } );
+        //获取线程返回结果
+        Task task = null;
+        try {
+            task = future.get( 5, TimeUnit.SECONDS );
         } catch (Exception e) {
             log.error( "poll task exception,type={},priority={}", type, priority );
             throw new TaskNotExistException( e );
