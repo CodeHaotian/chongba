@@ -290,17 +290,22 @@ public class TaskServiceImpl implements TaskService {
      */
     @Scheduled(cron = "*/1 * * * * ?")
     public void refresh() {
-        //从未来数据集合中获取所有的key
-        Set<String> futureKeys = cacheService.scan( Constants.FUTURE + "*" );
-        for (String futureKey : futureKeys) {
-            //转换key future_001_001 ->  topic_001_001
-            String topicKey = Constants.TOPIC + futureKey.split( Constants.FUTURE )[1];
-            //获取当前key的任务数据集合
-            Set<String> values = cacheService.zRangeByScore( futureKey, 0, System.currentTimeMillis() );
-            if (!values.isEmpty()) {
-                cacheService.refreshWithPipeline( futureKey, topicKey, values );
-                log.info( "成功的将{}定时刷新到{}", futureKey, topicKey );
+        threadPoolTaskExecutor.execute( new Runnable() {
+            @Override
+            public void run() {
+                //从未来数据集合中获取所有的key
+                Set<String> futureKeys = cacheService.scan( Constants.FUTURE + "*" );
+                for (String futureKey : futureKeys) {
+                    //转换key future_001_001 ->  topic_001_001
+                    String topicKey = Constants.TOPIC + futureKey.split( Constants.FUTURE )[1];
+                    //获取当前key的任务数据集合
+                    Set<String> values = cacheService.zRangeByScore( futureKey, 0, System.currentTimeMillis() );
+                    if (!values.isEmpty()) {
+                        cacheService.refreshWithPipeline( futureKey, topicKey, values );
+                        log.info( "成功的将{}定时刷新到{}", futureKey, topicKey );
+                    }
+                }
             }
-        }
+        } );
     }
 }
