@@ -50,17 +50,14 @@ public class TaskServiceImpl implements TaskService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public long addTask(Task task) throws ScheduleSystemException {
-        Future<Long> future = threadPoolTaskExecutor.submit( new Callable<Long>() {
-            @Override
-            public Long call() throws Exception {
-                //添加任务到数据库
-                boolean success = addTaskToDb( task );
-                if (success) {
-                    //添加任务到缓存
-                    addTaskToCache( task );
-                }
-                return task.getTaskId();
+        Future<Long> future = threadPoolTaskExecutor.submit( () -> {
+            //添加任务到数据库
+            boolean success = addTaskToDb( task );
+            if (success) {
+                //添加任务到缓存
+                addTaskToCache( task );
             }
+            return task.getTaskId();
         } );
         long taskId = -1;
         try {
@@ -224,21 +221,18 @@ public class TaskServiceImpl implements TaskService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Task poll(int type, int priority) throws TaskNotExistException {
-        Future<Task> future = threadPoolTaskExecutor.submit( new Callable<Task>() {
-            @Override
-            public Task call() throws Exception {
-                Task task = null;
-                String key = type + "_" + priority;
-                //获取第一个可执行任务
-                String taskJson = cacheService.lRightPop( Constants.TOPIC + key );
-                if (StrUtil.isNotEmpty( taskJson )) {
-                    //还原对象
-                    task = JSON.parseObject( taskJson, Task.class );
-                    //更新数据库
-                    updateDb( task.getTaskId(), Constants.EXECUTED );
-                }
-                return task;
+        Future<Task> future = threadPoolTaskExecutor.submit( () -> {
+            Task task = null;
+            String key = type + "_" + priority;
+            //获取第一个可执行任务
+            String taskJson = cacheService.lRightPop( Constants.TOPIC + key );
+            if (StrUtil.isNotEmpty( taskJson )) {
+                //还原对象
+                task = JSON.parseObject( taskJson, Task.class );
+                //更新数据库
+                updateDb( task.getTaskId(), Constants.EXECUTED );
             }
+            return task;
         } );
         //获取线程返回结果
         Task task = null;
@@ -290,20 +284,17 @@ public class TaskServiceImpl implements TaskService {
      */
     @Scheduled(cron = "*/1 * * * * ?")
     public void refresh() {
-        threadPoolTaskExecutor.execute( new Runnable() {
-            @Override
-            public void run() {
-                //从未来数据集合中获取所有的key
-                Set<String> futureKeys = cacheService.scan( Constants.FUTURE + "*" );
-                for (String futureKey : futureKeys) {
-                    //转换key future_001_001 ->  topic_001_001
-                    String topicKey = Constants.TOPIC + futureKey.split( Constants.FUTURE )[1];
-                    //获取当前key的任务数据集合
-                    Set<String> values = cacheService.zRangeByScore( futureKey, 0, System.currentTimeMillis() );
-                    if (!values.isEmpty()) {
-                        cacheService.refreshWithPipeline( futureKey, topicKey, values );
-                        log.info( "成功的将{}定时刷新到{}", futureKey, topicKey );
-                    }
+        threadPoolTaskExecutor.execute( () -> {
+            //从未来数据集合中获取所有的key
+            Set<String> futureKeys = cacheService.scan( Constants.FUTURE + "*" );
+            for (String futureKey : futureKeys) {
+                //转换key future_001_001 ->  topic_001_001
+                String topicKey = Constants.TOPIC + futureKey.split( Constants.FUTURE )[1];
+                //获取当前key的任务数据集合
+                Set<String> values = cacheService.zRangeByScore( futureKey, 0, System.currentTimeMillis() );
+                if (!values.isEmpty()) {
+                    cacheService.refreshWithPipeline( futureKey, topicKey, values );
+                    log.info( "成功的将{}定时刷新到{}", futureKey, topicKey );
                 }
             }
         } );
