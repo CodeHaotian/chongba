@@ -35,6 +35,14 @@ import java.util.concurrent.*;
 @Service
 @Slf4j
 public class TaskServiceImpl implements TaskService {
+    /**
+     * 任务类型列名
+     */
+    private static final String TASK_TYPE = "task_type";
+    /**
+     * 任务优先级列名
+     */
+    private static final String PRIORITY = "priority";
     @Autowired
     private TaskInfoMapper taskInfoMapper;
     @Autowired
@@ -252,8 +260,8 @@ public class TaskServiceImpl implements TaskService {
         // 清除缓存中原有的数据
         clearCache();
         QueryWrapper<TaskInfoEntity> wrapper = new QueryWrapper<>();
-        wrapper.select( "task_type", "priority" );
-        wrapper.groupBy( "task_type", "priority" );
+        wrapper.select( TASK_TYPE, PRIORITY );
+        wrapper.groupBy( TASK_TYPE, PRIORITY );
         log.info( "syncData group sql:{}", wrapper.getSqlSelect() );
         //分组得到任务类型与优先级
         List<Map<String, Object>> maps = taskInfoMapper.selectMaps( wrapper );
@@ -264,8 +272,8 @@ public class TaskServiceImpl implements TaskService {
         for (Map<String, Object> map : maps) {
             //使用多线程并发执行
             threadPoolTaskExecutor.execute( () -> {
-                int taskType = Integer.parseInt( String.valueOf( map.get( "task_type" ) ) );
-                int priority = Integer.parseInt( String.valueOf( map.get( "priority" ) ) );
+                int taskType = Integer.parseInt( String.valueOf( map.get( TASK_TYPE ) ) );
+                int priority = Integer.parseInt( String.valueOf( map.get( PRIORITY ) ) );
                 //从数据库分组查询所有任务数据
                 List<TaskInfoEntity> taskInfos = taskInfoMapper.queryAllTaskInfoByTaskTypeAndPriority( taskType, priority );
                 //将任务数据存入缓存
@@ -288,6 +296,7 @@ public class TaskServiceImpl implements TaskService {
             log.info( "数据恢复完成,共耗时:" + (System.currentTimeMillis() - start) + "毫秒" );
         } catch (InterruptedException e) {
             log.error( "数据恢复失败,失败原因：{}", e.getMessage() );
+           Thread.currentThread().interrupt();
         }
     }
 
