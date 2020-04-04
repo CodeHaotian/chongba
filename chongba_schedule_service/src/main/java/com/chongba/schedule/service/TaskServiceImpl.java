@@ -15,6 +15,8 @@ import com.chongba.schedule.mapper.TaskInfoMapper;
 import com.chongba.schedule.pojo.TaskInfoEntity;
 import com.chongba.schedule.pojo.TaskInfoLogsEntity;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -43,6 +45,7 @@ public class TaskServiceImpl implements TaskService {
      * 任务优先级列名
      */
     private static final String PRIORITY = "priority";
+    private static final Logger threadLogger = LoggerFactory.getLogger( "thread" );
     @Autowired
     private TaskInfoMapper taskInfoMapper;
     @Autowired
@@ -70,7 +73,7 @@ public class TaskServiceImpl implements TaskService {
             //获取结果
             taskId = future.get( 5, TimeUnit.SECONDS );
         } catch (Exception e) {
-            log.info( "add task exception" );
+            threadLogger.info( "add task exception" );
             throw new ScheduleSystemException( e );
         }
         return taskId;
@@ -104,7 +107,7 @@ public class TaskServiceImpl implements TaskService {
             taskInfoLogsMapper.insert( taskInfoLogsEntity );
             success = true;
         } catch (Exception e) {
-            log.error( "add task exception taskId={}", task.getTaskId() );
+            threadLogger.error( "add task exception taskId={}", task.getTaskId() );
             throw new ScheduleSystemException( e.getMessage() );
         }
         return success;
@@ -162,7 +165,7 @@ public class TaskServiceImpl implements TaskService {
             BeanUtils.copyProperties( taskInfoLogsEntity, task );
             task.setExecuteTime( taskInfoLogsEntity.getExecuteTime().getTime() );
         } catch (Exception e) {
-            log.error( "task cancel exception taskId={}", taskId );
+            threadLogger.error( "task cancel exception taskId={}", taskId );
             throw new TaskNotExistException( e.getMessage() );
         }
         return task;
@@ -218,7 +221,7 @@ public class TaskServiceImpl implements TaskService {
                 }
             }
         } catch (Exception e) {
-            log.error( "poll task exception" );
+            threadLogger.error( "poll task exception" );
             throw new TaskNotExistException( e );
         }
         return task;
@@ -245,7 +248,7 @@ public class TaskServiceImpl implements TaskService {
         try {
             task = future.get( 5, TimeUnit.SECONDS );
         } catch (Exception e) {
-            log.error( "poll task exception,type={},priority={}", type, priority );
+            threadLogger.error( "poll task exception,type={},priority={}", type, priority );
             throw new TaskNotExistException( e );
         }
         return task;
@@ -256,13 +259,13 @@ public class TaskServiceImpl implements TaskService {
      */
     @PostConstruct
     private void syncData() {
-        log.info( "******init******" );
+        threadLogger.info( "******init******" );
         // 清除缓存中原有的数据
         clearCache();
         QueryWrapper<TaskInfoEntity> wrapper = new QueryWrapper<>();
         wrapper.select( TASK_TYPE, PRIORITY );
         wrapper.groupBy( TASK_TYPE, PRIORITY );
-        log.info( "syncData group sql:{}", wrapper.getSqlSelect() );
+        threadLogger.info( "syncData group sql:{}", wrapper.getSqlSelect() );
         //分组得到任务类型与优先级
         List<Map<String, Object>> maps = taskInfoMapper.selectMaps( wrapper );
         //定义线程计数器
@@ -287,16 +290,16 @@ public class TaskServiceImpl implements TaskService {
                 } );
                 latch.countDown();
                 //追踪每个分组线程的信息
-                log.info( "线程名：{},计数器剩余：{},当前组恢复耗时：{}", Thread.currentThread().getName(), latch.getCount(), System.currentTimeMillis() - start );
+                threadLogger.info( "线程名：{},计数器剩余：{},当前组恢复耗时：{}", Thread.currentThread().getName(), latch.getCount(), System.currentTimeMillis() - start );
             } );
         }
         try {
             //阻塞当前线程，等待线程池线程返回  latch=0，注意该方法要在循环外执行
             latch.await( 1, TimeUnit.MINUTES );
-            log.info( "数据恢复完成,共耗时:" + (System.currentTimeMillis() - start) + "毫秒" );
+            threadLogger.info( "数据恢复完成,共耗时:" + (System.currentTimeMillis() - start) + "毫秒" );
         } catch (InterruptedException e) {
-            log.error( "数据恢复失败,失败原因：{}", e.getMessage() );
-           Thread.currentThread().interrupt();
+            threadLogger.error( "数据恢复失败,失败原因：{}", e.getMessage() );
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -327,7 +330,7 @@ public class TaskServiceImpl implements TaskService {
                 String topicKey = Constants.TOPIC + futureKey.split( Constants.FUTURE )[1];
                 if (!values.isEmpty()) {
                     cacheService.refreshWithPipeline( futureKey, topicKey, values );
-                    log.info( "成功的将{}定时刷新到{}", futureKey, topicKey );
+                    threadLogger.info( "成功的将{}定时刷新到{}", futureKey, topicKey );
                 }
             }
         } );
