@@ -53,8 +53,8 @@ public class TaskServiceTest {
             taskService.addTask( task );
         }
         // 消费拉取任务
-        while (taskService.size() > 0) {
-            Task task = taskService.poll();
+        while (taskService.size(250,250) > 0) {
+            Task task = taskService.poll(250,250);
             if (task != null) {
                 System.out.println( "成功消费了任务:" + task.getTaskId() );
             }

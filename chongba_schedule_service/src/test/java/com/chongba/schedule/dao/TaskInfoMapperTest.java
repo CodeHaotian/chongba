@@ -12,6 +12,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: Haotian
@@ -73,5 +75,33 @@ public class TaskInfoMapperTest {
     public void demo05() {
         //自定义查询所有方法
         taskInfoMapper.findAll().forEach( System.out::println );
+    }
+
+    public void initGroupData() {
+        //构造不同分组的任务数据
+        for (int i = 0; i < 20; i++) {
+            TaskInfoEntity taskInfo = new TaskInfoEntity();
+            taskInfo.setExecuteTime( new Date() );
+            if (i < 10) {
+                taskInfo.setTaskType( 1001 );
+                taskInfo.setPriority( 50 );
+            } else {
+                taskInfo.setTaskType( 1002 );
+                taskInfo.setPriority( 100 );
+            }
+            taskInfo.setParameters( "testGroup".getBytes() );
+            taskInfoMapper.insert( taskInfo );
+        }
+    }
+
+    @Test
+    public void testGroup() {
+        initGroupData();
+        //分组查询测试
+        QueryWrapper<TaskInfoEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select( "task_type", "priority" );
+        queryWrapper.groupBy( "task_type", "priority" );
+        List<Map<String, Object>> maps = taskInfoMapper.selectMaps( queryWrapper );
+        maps.forEach( System.out::println );
     }
 }

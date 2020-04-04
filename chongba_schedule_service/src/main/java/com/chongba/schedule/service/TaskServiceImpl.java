@@ -3,6 +3,7 @@ package com.chongba.schedule.service;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.chongba.cache.CacheService;
 import com.chongba.entity.Constants;
 import com.chongba.entity.Task;
@@ -23,10 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.*;
 
 /**
@@ -116,7 +114,7 @@ public class TaskServiceImpl implements TaskService {
         if (task.getExecuteTime() <= System.currentTimeMillis()) {
             cacheService.lLeftPush( Constants.TOPIC + key, JSON.toJSONString( task ) );
         } else {
-            cacheService.zAdd( Constants.FUTURE, JSON.toJSONString( task ), task.getExecuteTime() );
+            cacheService.zAdd( Constants.FUTURE + key, JSON.toJSONString( task ), task.getExecuteTime() );
         }
     }
 
@@ -253,18 +251,44 @@ public class TaskServiceImpl implements TaskService {
         log.info( "******init******" );
         // 清除缓存中原有的数据
         clearCache();
-        //从数据库查询所有任务数据
-        List<TaskInfoEntity> taskInfos = taskInfoMapper.findAll();
-        //将任务数据存入缓存
-        taskInfos.forEach( t -> {
-            Task task = new Task();
-            //属性拷贝
-            BeanUtils.copyProperties( t, task );
-            task.setExecuteTime( t.getExecuteTime().getTime() );
-            //加入缓存
-            addTaskToCache( task );
-        } );
-
+        QueryWrapper<TaskInfoEntity> wrapper = new QueryWrapper<>();
+        wrapper.select( "task_type", "priority" );
+        wrapper.groupBy( "task_type", "priority" );
+        log.info( "syncData group sql:{}", wrapper.getSqlSelect() );
+        //分组得到任务类型与优先级
+        List<Map<String, Object>> maps = taskInfoMapper.selectMaps( wrapper );
+        //定义线程计数器
+        CountDownLatch latch = new CountDownLatch( maps.size() );
+        //开始时间
+        long start = System.currentTimeMillis();
+        for (Map<String, Object> map : maps) {
+            //使用多线程并发执行
+            threadPoolTaskExecutor.execute( () -> {
+                int taskType = Integer.parseInt( String.valueOf( map.get( "task_type" ) ) );
+                int priority = Integer.parseInt( String.valueOf( map.get( "priority" ) ) );
+                //从数据库分组查询所有任务数据
+                List<TaskInfoEntity> taskInfos = taskInfoMapper.queryAllTaskInfoByTaskTypeAndPriority( taskType, priority );
+                //将任务数据存入缓存
+                taskInfos.forEach( t -> {
+                    Task task = new Task();
+                    //属性拷贝
+                    BeanUtils.copyProperties( t, task );
+                    task.setExecuteTime( t.getExecuteTime().getTime() );
+                    //加入缓存
+                    addTaskToCache( task );
+                } );
+                latch.countDown();
+                //追踪每个分组线程的信息
+                log.info( "线程名：{},计数器剩余：{},当前组恢复耗时：{}", Thread.currentThread().getName(), latch.getCount(), System.currentTimeMillis() - start );
+            } );
+        }
+        try {
+            //阻塞当前线程，等待线程池线程返回  latch=0，注意该方法要在循环外执行
+            latch.await( 1, TimeUnit.MINUTES );
+            log.info( "数据恢复完成,共耗时:" + (System.currentTimeMillis() - start) + "毫秒" );
+        } catch (InterruptedException e) {
+            log.error( "数据恢复失败,失败原因：{}", e.getMessage() );
+        }
     }
 
     /**
@@ -288,10 +312,10 @@ public class TaskServiceImpl implements TaskService {
             //从未来数据集合中获取所有的key
             Set<String> futureKeys = cacheService.scan( Constants.FUTURE + "*" );
             for (String futureKey : futureKeys) {
-                //转换key future_001_001 ->  topic_001_001
-                String topicKey = Constants.TOPIC + futureKey.split( Constants.FUTURE )[1];
                 //获取当前key的任务数据集合
                 Set<String> values = cacheService.zRangeByScore( futureKey, 0, System.currentTimeMillis() );
+                //转换key future_001_001 ->  topic_001_001
+                String topicKey = Constants.TOPIC + futureKey.split( Constants.FUTURE )[1];
                 if (!values.isEmpty()) {
                     cacheService.refreshWithPipeline( futureKey, topicKey, values );
                     log.info( "成功的将{}定时刷新到{}", futureKey, topicKey );
