@@ -46,6 +46,10 @@ public class TaskServiceImpl implements TaskService {
      */
     private static final String PRIORITY = "priority";
     private static final Logger threadLogger = LoggerFactory.getLogger( "thread" );
+    /**
+     * 未来五分钟时间点
+     */
+    private Long futureTime;
     @Autowired
     private TaskInfoMapper taskInfoMapper;
     @Autowired
@@ -124,7 +128,7 @@ public class TaskServiceImpl implements TaskService {
         // 判断任务应该放入消费者队列还是未来数据集合
         if (task.getExecuteTime() <= System.currentTimeMillis()) {
             cacheService.lLeftPush( Constants.TOPIC + key, JSON.toJSONString( task ) );
-        } else {
+        } else if (task.getExecuteTime() <= futureTime) {
             cacheService.zAdd( Constants.FUTURE + key, JSON.toJSONString( task ), task.getExecuteTime() );
         }
     }
@@ -268,6 +272,12 @@ public class TaskServiceImpl implements TaskService {
         threadLogger.info( "syncData group sql:{}", wrapper.getSqlSelect() );
         //分组得到任务类型与优先级
         List<Map<String, Object>> maps = taskInfoMapper.selectMaps( wrapper );
+
+        //获取未来5分钟时间
+        Calendar calendar = Calendar.getInstance();
+        calendar.add( Calendar.MINUTE, 5 );
+        futureTime = calendar.getTimeInMillis();
+
         //定义线程计数器
         CountDownLatch latch = new CountDownLatch( maps.size() );
         //开始时间
@@ -278,7 +288,7 @@ public class TaskServiceImpl implements TaskService {
                 int taskType = Integer.parseInt( String.valueOf( map.get( TASK_TYPE ) ) );
                 int priority = Integer.parseInt( String.valueOf( map.get( PRIORITY ) ) );
                 //从数据库分组查询所有任务数据
-                List<TaskInfoEntity> taskInfos = taskInfoMapper.queryAllTaskInfoByTaskTypeAndPriority( taskType, priority );
+                List<TaskInfoEntity> taskInfos = taskInfoMapper.queryFutureTaskInfoByTaskTypeAndPriority( taskType, priority, calendar.getTime() );
                 //将任务数据存入缓存
                 taskInfos.forEach( t -> {
                     Task task = new Task();
