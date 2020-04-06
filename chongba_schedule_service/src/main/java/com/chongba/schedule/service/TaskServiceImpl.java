@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,6 +58,8 @@ public class TaskServiceImpl implements TaskService {
     @Autowired
     @Qualifier("visiableThreadPool")
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
+    @Autowired
+    private ThreadPoolTaskScheduler threadPoolTaskScheduler;
     @Autowired
     private CacheService cacheService;
 
@@ -263,7 +266,17 @@ public class TaskServiceImpl implements TaskService {
      */
     @PostConstruct
     private void syncData() {
-        threadLogger.info( "******init******" );
+        threadPoolTaskScheduler.scheduleAtFixedRate( () -> {
+            threadLogger.info( "******init******" );
+            reloadData();
+        }, TimeUnit.MINUTES.toMillis( 5 ) );
+    }
+
+    /**
+     * 恢复缓存中的数据
+     */
+    private void reloadData() {
+        threadLogger.info( "******reloadData******" );
         // 清除缓存中原有的数据
         clearCache();
         QueryWrapper<TaskInfoEntity> wrapper = new QueryWrapper<>();
