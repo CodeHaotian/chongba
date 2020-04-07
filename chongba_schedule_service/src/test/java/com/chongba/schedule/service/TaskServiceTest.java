@@ -47,14 +47,14 @@ public class TaskServiceTest {
         for (int i = 0; i < 3; i++) {
             Task task = Task.builder()
                     .taskType( 250 )
-                    .executeTime( now.getTime() + 5000 * i )
+                    .executeTime( now.getTime() + 50000 * i )
                     .priority( 250 )
                     .parameters( "testPoolTask".getBytes() ).build();
             taskService.addTask( task );
         }
         // 消费拉取任务
-        while (taskService.size(250,250) > 0) {
-            Task task = taskService.poll(250,250);
+        while (true) {
+            Task task = taskService.poll( 250, 250 );
             if (task != null) {
                 System.out.println( "成功消费了任务:" + task.getTaskId() );
             }

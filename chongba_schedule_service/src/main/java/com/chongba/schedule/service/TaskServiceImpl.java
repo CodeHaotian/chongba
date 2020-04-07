@@ -9,6 +9,7 @@ import com.chongba.entity.Constants;
 import com.chongba.entity.Task;
 import com.chongba.exception.ScheduleSystemException;
 import com.chongba.exception.TaskNotExistException;
+import com.chongba.schedule.config.SystemParams;
 import com.chongba.schedule.inf.TaskService;
 import com.chongba.schedule.mapper.TaskInfoLogsMapper;
 import com.chongba.schedule.mapper.TaskInfoMapper;
@@ -62,6 +63,8 @@ public class TaskServiceImpl implements TaskService {
     private ThreadPoolTaskScheduler threadPoolTaskScheduler;
     @Autowired
     private CacheService cacheService;
+    @Autowired
+    private SystemParams systemParams;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -269,7 +272,7 @@ public class TaskServiceImpl implements TaskService {
         threadPoolTaskScheduler.scheduleAtFixedRate( () -> {
             threadLogger.info( "******init******" );
             reloadData();
-        }, TimeUnit.MINUTES.toMillis( 5 ) );
+        }, TimeUnit.MINUTES.toMillis( systemParams.getPreLoad() ) );
     }
 
     /**
@@ -286,9 +289,9 @@ public class TaskServiceImpl implements TaskService {
         //分组得到任务类型与优先级
         List<Map<String, Object>> maps = taskInfoMapper.selectMaps( wrapper );
 
-        //获取未来5分钟时间
+        //获取未来时间节点
         Calendar calendar = Calendar.getInstance();
-        calendar.add( Calendar.MINUTE, 5 );
+        calendar.add( Calendar.MINUTE, systemParams.getPreLoad() );
         futureTime = calendar.getTimeInMillis();
 
         //定义线程计数器
