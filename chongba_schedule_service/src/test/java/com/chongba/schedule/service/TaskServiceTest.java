@@ -1,5 +1,6 @@
 package com.chongba.schedule.service;
 
+import com.alibaba.fastjson.JSON;
 import com.chongba.entity.Task;
 import com.chongba.schedule.ScheduleApplication;
 import com.chongba.schedule.inf.TaskService;
@@ -65,5 +66,14 @@ public class TaskServiceTest {
                 e.printStackTrace();
             }
         }
+    }
+
+    @Test
+    public void json(){
+        Task task = new Task();
+        task.setTaskType(1001);
+        task.setPriority(1);
+        task.setExecuteTime(new Date().getTime());
+        System.out.println( JSON.toJSONString(task));
     }
 }

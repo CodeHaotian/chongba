@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Future;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -25,16 +27,20 @@ public class Task implements Serializable {
     /**
      * 类型
      */
+    @NotNull(message = "任务类型不能为空")
     private Integer taskType;
 
     /**
      * 优先级
      */
+    @NotNull(message = "任务优先级不能为空")
     private Integer priority;
 
     /**
      * 执行时间
      */
+    @NotNull(message = "任务执行时间不能为空")
+    @Future(message = "任务执行时间必须大于当前时间")
     private long executeTime;
 
     /**
