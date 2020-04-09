@@ -11,7 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @Author: Haotian
@@ -68,12 +70,4 @@ public class TaskServiceTest {
         }
     }
 
-    @Test
-    public void json(){
-        Task task = new Task();
-        task.setTaskType(1001);
-        task.setPriority(1);
-        task.setExecuteTime(new Date().getTime());
-        System.out.println( JSON.toJSONString(task));
-    }
 }
