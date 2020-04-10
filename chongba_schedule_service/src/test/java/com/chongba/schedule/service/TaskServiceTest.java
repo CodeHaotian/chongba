@@ -1,6 +1,5 @@
 package com.chongba.schedule.service;
 
-import com.alibaba.fastjson.JSON;
 import com.chongba.entity.Task;
 import com.chongba.schedule.ScheduleApplication;
 import com.chongba.schedule.inf.TaskService;
@@ -69,5 +68,4 @@ public class TaskServiceTest {
             }
         }
     }
-
 }

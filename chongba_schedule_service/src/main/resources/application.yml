@@ -1,6 +1,6 @@
 spring:
   application:
-    name: schedule-service #服务名
+    name: schedule-service # 服务名
   datasource:
     url: jdbc:mysql://192.168.200.129:3306/chongba_schedule?serverTimezone=Asia/Shanghai
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -13,5 +13,11 @@ spring:
   output:
     ansi:
       enabled: always
+  cloud: # 服务注册中心配置
+    consul:
+      host: 127.0.0.1
+      port: 8500
+      discovery:
+        service-name: ${spring.application.name}
 chongba:
-  preLoad: 1 #数据预加载时间/单位分钟
+  preLoad: 1 # 数据预加载时间/单位分钟
