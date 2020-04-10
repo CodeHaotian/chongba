@@ -66,4 +66,15 @@ public class TaskController {
         boolean isSuccess = taskService.cancelTask( taskId );
         return ResponseMessage.ok( isSuccess );
     }
+
+    /**
+     * 每秒刷新待消费任务到消费对列
+     *
+     * @return 请求回显信息
+     */
+    @GetMapping("/refresh")
+    public ResponseMessage<String> refresh() {
+        taskService.refresh();
+        return ResponseMessage.ok( "" );
+    }
 }

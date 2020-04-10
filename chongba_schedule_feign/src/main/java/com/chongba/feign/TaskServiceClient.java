@@ -21,7 +21,7 @@ public interface TaskServiceClient {
      * @param task 任务信息
      * @return 请求回显信息
      */
-    @PostMapping("/push")
+    @PostMapping("/task/push")
     ResponseMessage<Object> pushTask(@RequestBody @Valid Task task);
 
     /**
@@ -31,7 +31,7 @@ public interface TaskServiceClient {
      * @param priority 任务优先级
      * @return 请求回显信息
      */
-    @GetMapping("/poll/{taskType}/{priority}")
+    @GetMapping("/task/poll/{taskType}/{priority}")
     ResponseMessage<Task> pollTask(@Valid @PathVariable("taskType") Integer taskType,
                                    @Valid @PathVariable("priority") Integer priority);
 
@@ -41,6 +41,14 @@ public interface TaskServiceClient {
      * @param taskId 任务id
      * @return 请求回显信息
      */
-    @PostMapping("/cancel")
+    @PostMapping("/task/cancel")
     ResponseMessage<Object> cancelTask(@RequestParam("taskId") @NotNull(message = "任务id不能为空") Long taskId);
+
+    /**
+     * 每秒刷新待消费任务到消费对列
+     *
+     * @return 请求回显信息
+     */
+    @GetMapping("/task/refresh")
+    ResponseMessage<String> refresh();
 }

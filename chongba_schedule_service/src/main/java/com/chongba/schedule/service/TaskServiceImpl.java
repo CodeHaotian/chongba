@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
@@ -342,11 +341,7 @@ public class TaskServiceImpl implements TaskService {
         Set<String> topicKeys = cacheService.scan( Constants.TOPIC + "*" );
         cacheService.delete( topicKeys );
     }
-
-    /**
-     * 每秒刷新待消费任务到消费对列
-     */
-    @Scheduled(cron = "*/1 * * * * ?")
+    @Override
     public void refresh() {
         threadPoolTaskExecutor.execute( () -> {
             //从未来数据集合中获取所有的key

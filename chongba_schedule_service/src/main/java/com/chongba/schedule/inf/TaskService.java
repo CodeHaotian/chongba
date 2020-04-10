@@ -55,10 +55,15 @@ public interface TaskService {
     /**
      * 按照类型和优先级来拉取任务
      *
-     * @param type  任务类型
+     * @param type     任务类型
      * @param priority 任务优先级
      * @return 任务实体
      * @throws TaskNotExistException 任务异常
      */
     Task poll(int type, int priority) throws TaskNotExistException;
+
+    /**
+     * 每秒刷新待消费任务到消费对列
+     */
+    void refresh();
 }
