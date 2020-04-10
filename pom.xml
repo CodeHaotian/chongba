@@ -6,6 +6,7 @@
     <modules>
         <module>chongba_schedule_service</module>
         <module>chongba_common</module>
+        <module>chongba_schedule_feign</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>

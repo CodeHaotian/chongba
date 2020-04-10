@@ -47,7 +47,8 @@ public class TaskController {
      * @return 请求回显信息
      */
     @GetMapping("/poll/{taskType}/{priority}")
-    public ResponseMessage<Task> pollTask(@Valid @PathVariable("taskType") Integer taskType, @Valid @PathVariable("priority") Integer priority) {
+    public ResponseMessage<Task> pollTask(@Valid @PathVariable("taskType") Integer taskType,
+                                          @Valid @PathVariable("priority") Integer priority) {
         log.info( "poll taskType:{},priority:{}", taskType, priority );
         Task task = taskService.poll( taskType, priority );
         return ResponseMessage.ok( task );
