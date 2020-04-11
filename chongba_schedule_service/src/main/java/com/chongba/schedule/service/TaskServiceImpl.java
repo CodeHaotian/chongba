@@ -66,6 +66,8 @@ public class TaskServiceImpl implements TaskService {
     private CacheService cacheService;
     @Autowired
     private SystemParams systemParams;
+    @Autowired
+    private SelectMaster selectMaster;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -270,9 +272,16 @@ public class TaskServiceImpl implements TaskService {
      */
     @PostConstruct
     private void syncData() {
+        //注册抢占主节点
+        selectMaster.selectMaster( Constants.SCHEDULE_LEADER_PATH );
         threadPoolTaskScheduler.scheduleAtFixedRate( () -> {
-            threadLogger.info( "******init******" );
-            reloadData();
+            //只有主节点才能去恢复数据
+            if (selectMaster.checkMaster( Constants.SCHEDULE_LEADER_PATH )) {
+                threadLogger.info( "******init******" );
+                reloadData();
+            } else {
+                threadLogger.info( "schedule-service从节点备用" );
+            }
         }, TimeUnit.MINUTES.toMillis( systemParams.getPreLoad() ) );
     }
 
@@ -280,7 +289,7 @@ public class TaskServiceImpl implements TaskService {
      * 恢复缓存中的数据
      */
     private void reloadData() {
-        threadLogger.info( "******reloadData******" );
+        threadLogger.info( "schedule-service主节点进行数据恢复" );
         // 清除缓存中原有的数据
         clearCache();
         QueryWrapper<TaskInfoEntity> wrapper = new QueryWrapper<>();
@@ -341,6 +350,7 @@ public class TaskServiceImpl implements TaskService {
         Set<String> topicKeys = cacheService.scan( Constants.TOPIC + "*" );
         cacheService.delete( topicKeys );
     }
+
     @Override
     public void refresh() {
         threadPoolTaskExecutor.execute( () -> {

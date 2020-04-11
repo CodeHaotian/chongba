@@ -17,4 +17,9 @@ public class SystemParams {
      * 数据预加载时间/单位分钟
      */
     private int preLoad;
+
+    /**
+     * zookeeper 地址
+     */
+    private String selectMasterZookeeper;
 }

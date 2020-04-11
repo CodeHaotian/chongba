@@ -35,4 +35,9 @@ public class Constants {
      * 待消费队列key前缀
      */
     public static String FUTURE = "future_";
+
+    /**
+     * zookeeper 抢占目录
+     */
+    public static final String SCHEDULE_LEADER_PATH = "/chongba/schedule_master";
 }
