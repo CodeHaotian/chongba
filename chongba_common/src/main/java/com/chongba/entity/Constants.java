@@ -45,4 +45,9 @@ public class Constants {
      * zookeeper job定制刷新服务抢占目录
      */
     public static final String JOB_LEADER_PATH = "/chongba/job_master";
+
+    /**
+     * 全局共享时间key，用于存放数据恢复未来五分钟时间节点
+     */
+    public static final String NEXT_SCHEDULE_TIME = "nextScheduleTime";
 }

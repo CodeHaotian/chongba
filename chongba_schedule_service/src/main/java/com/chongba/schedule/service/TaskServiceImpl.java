@@ -49,10 +49,6 @@ public class TaskServiceImpl implements TaskService {
      */
     private static final String PRIORITY = "priority";
     private static final Logger threadLogger = LoggerFactory.getLogger( "thread" );
-    /**
-     * 未来五分钟时间点
-     */
-    private Long futureTime;
     @Autowired
     private TaskInfoMapper taskInfoMapper;
     @Autowired
@@ -134,11 +130,36 @@ public class TaskServiceImpl implements TaskService {
     private void addTaskToCache(Task task) {
         // 使用任务类型和优先级作为key
         String key = task.getTaskType() + "_" + task.getPriority();
+        // 获取时间节点
+        long nextScheduleTime = getNextScheduleTime();
         // 判断任务应该放入消费者队列还是未来数据集合
         if (task.getExecuteTime() <= System.currentTimeMillis()) {
             cacheService.lLeftPush( Constants.TOPIC + key, JSON.toJSONString( task ) );
-        } else if (task.getExecuteTime() <= futureTime) {
+        } else if (task.getExecuteTime() <= nextScheduleTime) {
             cacheService.zAdd( Constants.FUTURE + key, JSON.toJSONString( task ), task.getExecuteTime() );
+        }
+    }
+
+    /**
+     * 从缓存中获取时间节点
+     *
+     * @return 时间节点
+     */
+    private long getNextScheduleTime() {
+        //判断缓存中是否有数据
+        if (cacheService.exists( Constants.NEXT_SCHEDULE_TIME )) {
+            String nextScheduleTimeStr = cacheService.get( Constants.NEXT_SCHEDULE_TIME );
+            log.info( "从缓存中获取nextScheduleTime={}", nextScheduleTimeStr );
+            return Long.parseLong( nextScheduleTimeStr );
+        } else {
+            //数据补偿
+            Calendar calendar = Calendar.getInstance();
+            calendar.add( Calendar.MINUTE, systemParams.getPreLoad() );
+            long nextScheduleTimeStr = calendar.getTimeInMillis();
+            // 将时间放入缓存
+            cacheService.set( Constants.NEXT_SCHEDULE_TIME, String.valueOf( nextScheduleTimeStr ) );
+            log.info( "缓存中没有nextScheduleTime,进行数据补偿{}", nextScheduleTimeStr );
+            return nextScheduleTimeStr;
         }
     }
 
@@ -304,10 +325,11 @@ public class TaskServiceImpl implements TaskService {
         //分组得到任务类型与优先级
         List<Map<String, Object>> maps = taskInfoMapper.selectMaps( wrapper );
 
-        //获取未来时间节点
+        // 获取未来时间节点
         Calendar calendar = Calendar.getInstance();
         calendar.add( Calendar.MINUTE, systemParams.getPreLoad() );
-        futureTime = calendar.getTimeInMillis();
+        // 将时间放入缓存
+        cacheService.set( Constants.NEXT_SCHEDULE_TIME, String.valueOf( calendar.getTimeInMillis() ) );
 
         //定义线程计数器
         CountDownLatch latch = new CountDownLatch( maps.size() );
