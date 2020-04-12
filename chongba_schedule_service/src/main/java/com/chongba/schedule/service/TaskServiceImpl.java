@@ -274,6 +274,11 @@ public class TaskServiceImpl implements TaskService {
     private void syncData() {
         //注册抢占主节点
         selectMaster.selectMaster( Constants.SCHEDULE_LEADER_PATH );
+        try {
+            Thread.sleep( 1000L );
+        } catch (InterruptedException e) {
+            threadLogger.error( "syncData Thread sleep exception {}", e.getMessage() );
+        }
         threadPoolTaskScheduler.scheduleAtFixedRate( () -> {
             //只有主节点才能去恢复数据
             if (selectMaster.checkMaster( Constants.SCHEDULE_LEADER_PATH )) {

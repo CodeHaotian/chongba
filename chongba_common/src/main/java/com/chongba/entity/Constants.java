@@ -37,7 +37,12 @@ public class Constants {
     public static String FUTURE = "future_";
 
     /**
-     * zookeeper 抢占目录
+     * zookeeper 数据恢复功能抢占目录
      */
     public static final String SCHEDULE_LEADER_PATH = "/chongba/schedule_master";
+
+    /**
+     * zookeeper job定制刷新服务抢占目录
+     */
+    public static final String JOB_LEADER_PATH = "/chongba/job_master";
 }

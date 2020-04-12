@@ -1,6 +1,6 @@
-package com.chongba.schedule.service;
+package com.chongba.job.service;
 
-import com.chongba.schedule.config.SystemParams;
+import com.chongba.job.config.SystemParams;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.recipes.leader.LeaderSelector;

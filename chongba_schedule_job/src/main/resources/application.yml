@@ -16,3 +16,5 @@ spring:
   output:
     ansi:
       enabled: always
+chongba:
+  selectMasterZookeeper: 192.168.200.129:2181 # zookeeper 地址
