@@ -13,9 +13,11 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @Author: Haotian
- * @Date: 2020/4/10 17:49
- * @Description: zookeeper 选主
+ * zookeeper 选主
+ *
+ * @author Haotian
+ * @version 1.0.0
+ * @date 2020/4/10 17:49
  */
 @Component
 public class SelectMaster {

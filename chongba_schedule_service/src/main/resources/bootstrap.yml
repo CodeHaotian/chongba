@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: schedule-service
+  profiles:
+    active: dev # 是支持springboot多环境
+  cloud: # 服务注册中心配置
+    consul:
+      host: 127.0.0.1
+      port: 8500
+      discovery:
+        serviceName: ${spring.application.name}
+      config: # 以下设置key完整为 config/schedule,dev/data
+        enabled: true # 设置config是否启用，默认为true
+        format: yaml # 设置配置的值的格式，可以yaml或properties
+        prefix: config # 设置配的基本目录
+        defaultContext: schedule # 设置默认的配置，被所有的应用读取
+        data-key: data

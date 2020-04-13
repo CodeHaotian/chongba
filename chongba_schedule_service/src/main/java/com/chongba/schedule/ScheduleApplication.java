@@ -14,10 +14,12 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
- * @Author: Haotian
- * @Date: 2020/3/17 16:25
- * @Description: 启动类
- */
+ * 启动类
+ *
+ * @author Haotian
+ * @version 1.0.0
+ * @date 2020/4/13 20:39
+ **/
 @SpringBootApplication
 @MapperScan("com.chongba.schedule.mapper")
 @ComponentScan({"com.chongba.cache", "com.chongba.schedule"})
@@ -57,14 +59,14 @@ public class ScheduleApplication {
     }
 
     @Bean("visiableThreadPool")
-    public ThreadPoolTaskExecutor visiableThreadPool(){
+    public ThreadPoolTaskExecutor visiableThreadPool() {
         ThreadPoolTaskExecutor visiableThreadPool = new VisiableThreadPool();
-        visiableThreadPool.setCorePoolSize(10);
-        visiableThreadPool.setMaxPoolSize(1000);
-        visiableThreadPool.setKeepAliveSeconds(60);
-        visiableThreadPool.setQueueCapacity(1000);
-        visiableThreadPool.setThreadNamePrefix("visiableThreadPool-");
-        visiableThreadPool.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
+        visiableThreadPool.setCorePoolSize( 10 );
+        visiableThreadPool.setMaxPoolSize( 1000 );
+        visiableThreadPool.setKeepAliveSeconds( 60 );
+        visiableThreadPool.setQueueCapacity( 1000 );
+        visiableThreadPool.setThreadNamePrefix( "visiableThreadPool-" );
+        visiableThreadPool.setRejectedExecutionHandler( new ThreadPoolExecutor.DiscardPolicy() );
         visiableThreadPool.initialize();
         return visiableThreadPool;
     }
