@@ -35,6 +35,10 @@ public class StatusCode {
      */
     public static final int BALANCE_NOT_ENOUGH = 20006;
     /**
+     * 状态检查
+     */
+    public static final int STATE_CHECK = 20008;
+    /**
      * 订单请求失败，重试
      */
     public static final int ORDER_REQ_FAILED = 208508;

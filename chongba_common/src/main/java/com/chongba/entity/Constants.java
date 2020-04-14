@@ -50,4 +50,18 @@ public class Constants {
      * 全局共享时间key，用于存放数据恢复未来五分钟时间节点
      */
     public static final String NEXT_SCHEDULE_TIME = "nextScheduleTime";
+
+    public static final String jisuapi = "jisuapi";
+    public static final String juheapi = "juheapi";
+
+    public static final String jisu_order = "order_jisu";
+
+    /**
+     * 供应商排除key
+     */
+    public static final String exclude_supplier = "exclude_supplier";
+    /**
+     * 订单检查集合key
+     */
+    public static final String order_checked = "order_checked";
 }

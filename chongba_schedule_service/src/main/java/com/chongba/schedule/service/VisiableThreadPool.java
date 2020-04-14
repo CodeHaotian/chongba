@@ -7,10 +7,12 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
 /**
- * @Author: Haotian
- * @Date: 2020/3/29 23:41
- * @Description: 线程池监控扩展
- */
+ * 线程池监控扩展
+ *
+ * @author Haotian
+ * @version 1.0.0
+ * @date 2020/4/14 14:45
+ **/
 @Slf4j
 public class VisiableThreadPool extends ThreadPoolTaskExecutor {
 
