@@ -50,10 +50,10 @@ public class SupplierServiceImpl implements SupplierService {
         String url = supplierConfig.getApis().get( rechargeRequest.getSupply() );
         rechargeRequest.setRechargeUrl( url );
         //根据需要对接的供应商的编号确定不同的对接方式---不同的api需要传递的参数类型和参数名称等各不相同
-        if (Constants.juheapi.equals( rechargeRequest.getRechargeUrl() )) {
+        if (Constants.juheapi.equals( rechargeRequest.getSupply() )) {
             // 对接聚合
             doPostJuhe( rechargeRequest );
-        } else if (Constants.jisuapi.equals( rechargeRequest.getRechargeUrl() )) {
+        } else if (Constants.jisuapi.equals( rechargeRequest.getSupply() )) {
             // 对接极速
             doPostJisu( rechargeRequest );
         }
