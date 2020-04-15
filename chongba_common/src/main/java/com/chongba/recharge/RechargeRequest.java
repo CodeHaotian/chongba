@@ -28,9 +28,9 @@ public class RechargeRequest implements Serializable {
     private String orderNo;
 
     /**
-     * 默认供应商编号:例如jisuapi
+     * 供应商编号:例如jisuapi
      */
-    private String supply = "juheapi";
+    private String supply;
 
     /**
      * 供应商交易地址
