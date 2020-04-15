@@ -74,7 +74,7 @@ public class OrderController {
      *
      * @return 选择支付页面
      */
-    @RequestMapping(value = "/payorder")
+    @RequestMapping("/payorder")
     public ModelAndView payOrder(String orderNo) {
         OrderTrade orderTrade = null;
         try {

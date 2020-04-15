@@ -2,6 +2,7 @@ package com.chongba.recharge.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import com.chongba.constant.StatusCode;
 import com.chongba.entity.Result;
 import com.chongba.enums.OrderStatusEnum;
 import com.chongba.recharge.RechargeRequest;
@@ -39,7 +40,10 @@ public class OrderProcessServiceImpl implements OrderProcessService {
         RechargeResponse rechargeResponse = RechargeResponse.builder().mobile( request.getMobile() )
                 .orderNo( orderTrade.getOrderNo() )
                 .pamt( request.getPamt() ).build();
-        return Result.<RechargeResponse>builder().data( rechargeResponse ).build();
+        return Result.<RechargeResponse>builder()
+                .code( StatusCode.OK )
+                .msg( "操作成功" )
+                .data( rechargeResponse ).build();
     }
 
     @Override

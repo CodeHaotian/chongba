@@ -11,6 +11,7 @@
         <module>chongba_recharge_trade</module>
         <module>chongba_recharge_web</module>
         <module>chongba_recharge_mock</module>
+        <module>chongba_recharge_supplier</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
