@@ -2,8 +2,11 @@ package com.chongba.supplier.service.impl;
 
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.chongba.entity.Constants;
+import com.chongba.entity.Result;
 import com.chongba.recharge.RechargeRequest;
+import com.chongba.recharge.RechargeResponse;
 import com.chongba.supplier.config.SupplierConfig;
 import com.chongba.supplier.service.SupplierService;
 import lombok.extern.slf4j.Slf4j;
@@ -34,15 +37,16 @@ public class SupplierServiceImpl implements SupplierService {
 
     @Override
     public void recharge(RechargeRequest rechargeRequest) {
-        doDispatchSupplier( rechargeRequest );
+        Result<RechargeResponse> rechargeResponseResult = doDispatchSupplier( rechargeRequest );
     }
 
     /**
      * 供应商分发
      *
      * @param rechargeRequest 充值信息
+     * @return 接口返回信息
      */
-    private void doDispatchSupplier(RechargeRequest rechargeRequest) {
+    private Result<RechargeResponse> doDispatchSupplier(RechargeRequest rechargeRequest) {
         if (StrUtil.isEmpty( rechargeRequest.getSupply() )) {
             rechargeRequest.setSupply( Constants.juheapi );
         }
@@ -52,19 +56,21 @@ public class SupplierServiceImpl implements SupplierService {
         //根据需要对接的供应商的编号确定不同的对接方式---不同的api需要传递的参数类型和参数名称等各不相同
         if (Constants.juheapi.equals( rechargeRequest.getSupply() )) {
             // 对接聚合
-            doPostJuhe( rechargeRequest );
+            return doPostJuhe( rechargeRequest );
         } else if (Constants.jisuapi.equals( rechargeRequest.getSupply() )) {
             // 对接极速
-            doPostJisu( rechargeRequest );
+            return doPostJisu( rechargeRequest );
         }
+        return null;
     }
 
     /**
      * 聚合平台对接
      *
      * @param rechargeRequest 充值信息
+     * @return 接口返回信息
      */
-    private void doPostJuhe(RechargeRequest rechargeRequest) {
+    private Result<RechargeResponse> doPostJuhe(RechargeRequest rechargeRequest) {
         // 聚合要求传递的是json格式的数据
         // 创建并设置请求头
         HttpHeaders httpHeaders = new HttpHeaders();
@@ -73,16 +79,18 @@ public class SupplierServiceImpl implements SupplierService {
         HttpEntity<String> httpEntity = new HttpEntity<>( JSON.toJSONString( rechargeRequest ), httpHeaders );
         // 发送请求
         ResponseEntity<String> responseEntity = restTemplate.postForEntity( rechargeRequest.getRechargeUrl(), httpEntity, String.class );
-        // 获取结果
-        String entityBody = responseEntity.getBody();
-        log.info( "聚合平台充值回显{}", entityBody );
+        // 转换获取结果
+        return JSON.parseObject( responseEntity.getBody(), new TypeReference<Result<RechargeResponse>>() {
+        } );
     }
 
     /**
      * 极速平台对接
      *
      * @param rechargeRequest 充值信息
+     * @return 接口返回信息
      */
-    private void doPostJisu(RechargeRequest rechargeRequest) {
+    private Result<RechargeResponse> doPostJisu(RechargeRequest rechargeRequest) {
+        return null;
     }
 }
