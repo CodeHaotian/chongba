@@ -9,6 +9,10 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
+    <properties>
+        <protostuff-version>1.7.1</protostuff-version>
+    </properties>
+
     <artifactId>chongba_common</artifactId>
     <dependencies>
         <dependency>
@@ -19,6 +23,17 @@
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
             <version>1.2.67</version>
+        </dependency>
+        <!--protostuff序列化支持-->
+        <dependency>
+            <groupId>io.protostuff</groupId>
+            <artifactId>protostuff-runtime</artifactId>
+            <version>${protostuff-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.protostuff</groupId>
+            <artifactId>protostuff-core</artifactId>
+            <version>${protostuff-version}</version>
         </dependency>
     </dependencies>
 </project>
