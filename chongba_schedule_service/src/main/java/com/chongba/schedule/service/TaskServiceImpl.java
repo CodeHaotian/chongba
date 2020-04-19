@@ -33,10 +33,12 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @Author: Haotian
- * @Date: 2020/3/20 16:41
- * @Description: 任务接口实现
- */
+ * 任务接口实现
+ *
+ * @author Haotian
+ * @version 1.0.0
+ * @date 2020/4/19 23:53
+ **/
 @Service
 @Slf4j
 public class TaskServiceImpl implements TaskService {
