@@ -13,9 +13,11 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * @Author: Haotian
- * @Date: 2020/3/18 17:26
- * @Description: 任务信息实体类
+ * 任务信息实体类
+ *
+ * @author Haotian
+ * @version 1.0.0
+ * @date 2020/4/20 23:47
  **/
 @Data
 @NoArgsConstructor
