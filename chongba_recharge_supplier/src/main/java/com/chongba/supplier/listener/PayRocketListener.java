@@ -8,6 +8,8 @@ import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.springframework.stereotype.Component;
 
 /**
+ * 消息监听类
+ *
  * @author Haotian
  * @version 1.0.0
  * @date 2020/4/15 15:24
