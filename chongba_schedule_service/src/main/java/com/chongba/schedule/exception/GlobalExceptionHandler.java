@@ -9,19 +9,22 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import javax.validation.ConstraintViolationException;
 
 /**
- * @Author: Haotian
- * @Date: 2020/4/8 16:46
- * @Description: 全局异常处理
- */
+ * 全局异常处理
+ *
+ * @author Haotian
+ * @version 1.0.0
+ * @date 2020/5/7 16:09
+ **/
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
     @ExceptionHandler(value = Exception.class)
     public ResponseMessage<Object> error(Exception e) {
-        log.error( e.getMessage());
+        log.error( e.getMessage() );
         if (e instanceof MethodArgumentNotValidException) {
             // 对方法上@RequestBody的Bean参数校验的处理
             MethodArgumentNotValidException methodArgumentNotValidException = (MethodArgumentNotValidException) e;
+            methodArgumentNotValidException.getBindingResult().getFieldError().getDefaultMessage();
             return ResponseMessage.error( methodArgumentNotValidException.getBindingResult().getFieldError().getDefaultMessage() );
         }
         if (e instanceof ConstraintViolationException) {
