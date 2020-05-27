@@ -10,10 +10,12 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
 /**
- * @Author: Haotian
- * @Date: 2020/4/8 17:24
- * @Description: 自定义参数验证配置类
- */
+ * 自定义参数验证配置类
+ *
+ * @author Haotian
+ * @version 1.0.0
+ * @date 2020/5/7 16:40
+ **/
 @Configuration
 public class ValidatedConfig {
     @Bean
@@ -30,7 +32,6 @@ public class ValidatedConfig {
                 .configure()
                 // 设置validator模式为快速失败（只要有一个校验不通过就立即返回错误）
                 .failFast( true )
-//                .addProperty( "hibernate.validator.fail_fast", "true" ) // 和上一个方法等同
                 .buildValidatorFactory();
         return validatorFactory.getValidator();
     }

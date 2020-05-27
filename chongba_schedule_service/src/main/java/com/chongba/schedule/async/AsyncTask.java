@@ -5,10 +5,12 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 /**
- * @Author: Haotian
- * @Date: 2020/3/27 21:52
- * @Description: 异步调用
- */
+ * 异步调用
+ *
+ * @author Haotian
+ * @version 1.0.0
+ * @date 2020/5/27 17:35
+ **/
 @Component
 @Slf4j
 public class AsyncTask {
