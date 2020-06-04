@@ -77,10 +77,10 @@ public class MockJisuRechargeController extends BaseController {
         System.out.println( " /mobilerecharge/orderState " + outorderNo );
         System.out.println( " /mobilerecharge/orderState " + tradeNo );
         if (cacheSevice.hExists( Constants.jisu_order, key )) {
-            result = (Result<RechargeResponse>) JSON.parseObject( String.valueOf( cacheSevice.hGet( Constants.jisu_order, key ) ), new TypeReference<Result<RechargeResponse>>() {
+            result = JSON.parseObject( String.valueOf( cacheSevice.hGet( Constants.jisu_order, key ) ), new TypeReference<Result<RechargeResponse>>() {
             } );
         } else {
-            result = new Result<RechargeResponse>();
+            result = new Result<>();
             RechargeResponse response = new RechargeResponse();
             response.setStatus( OrderStatusEnum.FAIL.getCode() );
             response.setOrderNo( outorderNo );
