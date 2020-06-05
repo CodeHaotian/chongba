@@ -14,10 +14,12 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.concurrent.ScheduledFuture;
 
 /**
- * @Author: Haotian
- * @Date: 2020/4/6 16:51
- * @Description: 定时任务测试
- */
+ * 定时任务测试
+ *
+ * @author Haotian
+ * @version 1.0.0
+ * @date 2020/6/5 16:50
+ **/
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ScheduleApplication.class)
 public class DynamicTaskTest {

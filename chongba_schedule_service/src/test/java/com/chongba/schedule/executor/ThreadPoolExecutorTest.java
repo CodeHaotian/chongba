@@ -7,10 +7,12 @@ import java.util.List;
 import java.util.concurrent.*;
 
 /**
- * @Author: Haotian
- * @Date: 2020/3/24 15:16
- * @Description: 线程池测试
- */
+ * 线程池测试
+ *
+ * @author Haotian
+ * @version 1.0.0
+ * @date 2020/6/5 16:51
+ **/
 @Slf4j
 public class ThreadPoolExecutorTest {
     public static void main(String[] args) throws Exception {

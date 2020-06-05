@@ -3,10 +3,12 @@ package com.chongba.schedule.executor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * @Author: Haotian
- * @Date: 2020/3/24 12:43
- * @Description: 线程测试类
- */
+ * 线程测试类
+ *
+ * @author Haotian
+ * @version 1.0.0
+ * @date 2020/6/5 16:51
+ **/
 @Slf4j
 public class ThreadTest {
     public static void main(String[] args) {

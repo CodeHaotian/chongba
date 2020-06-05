@@ -12,10 +12,12 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.test.context.junit4.SpringRunner;
 
 /**
- * @Author: Haotian
- * @Date: 2020/3/26 18:55
- * @Description: Spring 线程池测试
- */
+ * Spring 线程池测试
+ *
+ * @author Haotian
+ * @version 1.0.0
+ * @date 2020/6/5 16:50
+ **/
 @Slf4j
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ScheduleApplication.class)
