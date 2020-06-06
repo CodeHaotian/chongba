@@ -16,10 +16,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @Author: Haotian
- * @Date: 2020/3/18 17:36
- * @Description: 任务信息操作接口测试
- */
+ * 任务信息操作接口测试
+ *
+ * @author Haotian
+ * @version 1.0.0
+ * @date 2020/6/6 23:25
+ **/
 @Slf4j
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ScheduleApplication.class)

@@ -13,10 +13,12 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.Date;
 
 /**
- * @Author: Haotian
- * @Date: 2020/3/18 19:14
- * @Description: 任务信息操作日志接口测试
- */
+ * 任务信息操作日志接口测试
+ *
+ * @author Haotian
+ * @version 1.0.0
+ * @date 2020/6/6 23:11
+ **/
 @Slf4j
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ScheduleApplication.class)
