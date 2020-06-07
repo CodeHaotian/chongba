@@ -23,10 +23,12 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @Author: Haotian
- * @Date: 2020/3/20 20:54
- * @Description: redis 工具类测试
- */
+ * redis 工具类测试
+ *
+ * @author Haotian
+ * @version 1.0.0
+ * @date 2020/6/7 22:10
+ **/
 @Slf4j
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ScheduleApplication.class)
