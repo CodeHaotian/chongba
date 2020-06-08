@@ -8,10 +8,12 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * @Author: Haotian
- * @Date: 2020/3/17 16:42
- * @Description: timer 单机延迟任务测试
- */
+ * timer 单机延迟任务测试
+ *
+ * @author Haotian
+ * @version 1.0.0
+ * @date 2020/6/8 17:10
+ **/
 @Slf4j
 public class TimerTaskTest {
 

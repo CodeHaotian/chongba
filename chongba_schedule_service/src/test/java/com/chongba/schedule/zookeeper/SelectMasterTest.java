@@ -11,10 +11,12 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @Author: Haotian
- * @Date: 2020/4/10 17:49
- * @Description: zookeeper 选主测试
- */
+ * zookeeper 选主测试
+ *
+ * @author Haotian
+ * @version 1.0.0
+ * @date 2020/6/8 17:11
+ **/
 public class SelectMasterTest {
     private static final String SELECT_MASTER_ZOOKEEPER = "192.168.200.129:2181";
     //可以放很多节点

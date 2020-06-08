@@ -10,10 +10,12 @@ import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @Author: Haotian
- * @Date: 2020/3/17 19:42
- * @Description: 延迟队列
- */
+ * 延迟队列
+ *
+ * @author Haotian
+ * @version 1.0.0
+ * @date 2020/6/8 17:10
+ **/
 @Slf4j
 public class DelayedTask implements Delayed {
     /**
