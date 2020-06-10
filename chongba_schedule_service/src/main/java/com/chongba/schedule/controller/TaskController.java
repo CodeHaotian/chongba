@@ -11,10 +11,12 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 /**
- * @Author: Haotian
- * @Date: 2020/4/7 10:49
- * @Description: 任务请求接口
- */
+ * 任务请求接口
+ *
+ * @author Haotian
+ * @version 1.0.0
+ * @date 2020/6/10 15:52
+ **/
 @Slf4j
 @Validated
 @RestController

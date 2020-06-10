@@ -5,10 +5,12 @@ import com.chongba.exception.ScheduleSystemException;
 import com.chongba.exception.TaskNotExistException;
 
 /**
- * @Author: Haotian
- * @Date: 2020/3/19 20:57
- * @Description: 任务服务
- */
+ * 任务服务
+ *
+ * @author Haotian
+ * @version 1.0.0
+ * @date 2020/6/10 15:52
+ **/
 public interface TaskService {
     /**
      * 添加任务

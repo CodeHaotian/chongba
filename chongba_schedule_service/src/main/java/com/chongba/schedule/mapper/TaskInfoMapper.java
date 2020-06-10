@@ -9,10 +9,12 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * @Author: Haotian
- * @Date: 2020/3/18 17:32
- * @Description: 任务信息通用接口
- */
+ * 任务信息通用接口
+ *
+ * @author Haotian
+ * @version 1.0.0
+ * @date 2020/6/10 15:51
+ **/
 public interface TaskInfoMapper extends BaseMapper<TaskInfoEntity> {
     /**
      * 查询所有

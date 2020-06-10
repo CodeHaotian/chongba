@@ -5,10 +5,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 /**
- * @Author: Haotian
- * @Date: 2020/4/7 10:13
- * @Description: 系统配置类
- */
+ * 系统配置类
+ *
+ * @author Haotian
+ * @version 1.0.0
+ * @date 2020/6/10 15:53
+ **/
 @Data
 @ConfigurationProperties(prefix = "chongba")
 @Component
