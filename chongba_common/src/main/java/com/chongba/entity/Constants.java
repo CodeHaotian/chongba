@@ -1,9 +1,11 @@
 package com.chongba.entity;
 
 /**
- * @Author: Haotian
- * @Date: 2020/3/19 20:50
- * @Description: 任务常量类
+ * 任务常量类
+ *
+ * @author Haotian
+ * @version 1.0.0
+ * @date 2020/6/11 16:04
  **/
 public class Constants {
     /**

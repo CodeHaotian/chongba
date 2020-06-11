@@ -10,9 +10,11 @@ import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
- * @Author: Haotian
- * @Date: 2020/3/19 20:47
- * @Description: 任务实体类
+ * 任务实体类
+ *
+ * @author Haotian
+ * @version 1.0.0
+ * @date 2020/6/11 16:04
  **/
 @Data
 @NoArgsConstructor

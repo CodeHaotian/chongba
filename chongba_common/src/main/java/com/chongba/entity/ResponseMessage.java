@@ -7,9 +7,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * @Author: Haotian
- * @Date: 2020/4/7 10:43
- * @Description: 统一请求返回封装类
+ * 统一请求返回封装类
+ *
+ * @author Haotian
+ * @version 1.0.0
+ * @date 2020/6/11 16:04
  **/
 @Data
 @NoArgsConstructor

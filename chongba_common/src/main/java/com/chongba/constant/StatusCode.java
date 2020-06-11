@@ -1,9 +1,11 @@
 package com.chongba.constant;
 
 /**
- * @Author: Haotian
- * @Date: 2020/4/7 10:41
- * @Description: 请求状态码
+ * 请求状态码
+ *
+ * @author Haotian
+ * @version 1.0.0
+ * @date 2020/6/11 16:03
  **/
 public class StatusCode {
     /**
