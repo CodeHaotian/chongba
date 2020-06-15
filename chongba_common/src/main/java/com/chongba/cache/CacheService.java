@@ -19,9 +19,11 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @Author: Haotian
- * @Date: 2020/3/20 20:19
- * @Description: redis 操作工具类
+ * redis 操作工具类
+ *
+ * @author Haotian
+ * @version 1.0.0
+ * @date 2020/6/15 14:12
  **/
 @Component
 public class CacheService extends CachingConfigurerSupport {
